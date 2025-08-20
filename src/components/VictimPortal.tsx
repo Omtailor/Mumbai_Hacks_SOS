@@ -94,7 +94,8 @@ const VictimPortal: React.FC<VictimPortalProps> = ({ isOnline, onRequestQueued }
       };
 
       if (isOnline) {
-        await addSOSRequest(sosRequest);
+        const requestId = await addSOSRequest(sosRequest);
+        console.log('SOS request submitted with ID:', requestId);
         
         if (analysis.priority === 'spam') {
           alert('⚠️ Request submitted but flagged by AI for review.');

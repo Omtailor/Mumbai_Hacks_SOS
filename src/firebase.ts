@@ -41,13 +41,13 @@ export interface SOSRequest {
 export const addSOSRequest = async (request: Omit<SOSRequest, 'id'>) => {
   try {
     const newRequestRef = push(sosRequestsRef);
-    const requestWithId = {
+    const requestWithTimestamp = {
       ...request,
       id: newRequestRef.key!,
-      createdAt: serverTimestamp(),
-      lastModified: serverTimestamp()
+      createdAt: new Date().toISOString(), // Use ISO string for consistency
+      lastModified: Date.now()
     };
-    await update(newRequestRef, requestWithId);
+    await update(newRequestRef, requestWithTimestamp);
     return newRequestRef.key;
   } catch (error) {
     console.error('Error adding SOS request:', error);
@@ -61,7 +61,7 @@ export const updateSOSRequest = async (id: string, updates: Partial<SOSRequest>)
     const requestRef = ref(database, `sosRequests/${id}`);
     await update(requestRef, {
       ...updates,
-      lastModified: serverTimestamp()
+      lastModified: Date.now()
     });
   } catch (error) {
     console.error('Error updating SOS request:', error);
@@ -88,14 +88,18 @@ export const subscribeToSOSRequests = (callback: (requests: SOSRequest[]) => voi
       const requests = Object.values(data) as SOSRequest[];
       // Sort by creation time (newest first)
       requests.sort((a, b) => {
-        const timeA = typeof a.createdAt === 'string' ? new Date(a.createdAt).getTime() : a.createdAt as number;
-        const timeB = typeof b.createdAt === 'string' ? new Date(b.createdAt).getTime() : b.createdAt as number;
+        const timeA = new Date(a.createdAt).getTime();
+        const timeB = new Date(b.createdAt).getTime();
         return timeB - timeA;
       });
       callback(requests);
     } else {
       callback([]);
     }
+  }, (error) => {
+    console.error('Firebase subscription error:', error);
+    // Fallback to empty array on error
+    callback([]);
   });
 };
 

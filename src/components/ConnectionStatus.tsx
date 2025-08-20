@@ -16,32 +16,49 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   const [connectedUsers, setConnectedUsers] = useState(0);
 
   useEffect(() => {
-    if (!isOnline) return;
+    if (!isOnline) {
+      setConnectedUsers(0);
+      return;
+    }
 
     // Create a unique connection reference
     const connectionId = `connection_${Date.now()}_${Math.random()}`;
     const myConnectionRef = ref(database, `connections/${connectionId}`);
     const connectionsRef = ref(database, 'connections');
 
-    // Set this connection as active
-    set(myConnectionRef, {
-      timestamp: Date.now(),
-      userAgent: navigator.userAgent.substring(0, 100)
-    });
+    const setupConnection = async () => {
+      try {
+        // Set this connection as active
+        await set(myConnectionRef, {
+          timestamp: Date.now(),
+          userAgent: navigator.userAgent.substring(0, 100)
+        });
 
-    // Remove this connection when user disconnects
-    onDisconnect(myConnectionRef).remove();
+        // Remove this connection when user disconnects
+        await onDisconnect(myConnectionRef).remove();
+        
+        console.log('Connection established:', connectionId);
+      } catch (error) {
+        console.error('Error setting up connection:', error);
+      }
+    };
+
+    setupConnection();
 
     // Listen to all connections
     const unsubscribe = onValue(connectionsRef, (snapshot) => {
       const connections = snapshot.val();
       const count = connections ? Object.keys(connections).length : 0;
+      console.log('Connected devices:', count);
       setConnectedUsers(count);
+    }, (error) => {
+      console.error('Connection monitoring error:', error);
+      setConnectedUsers(0);
     });
-
     return () => {
       unsubscribe();
-      set(myConnectionRef, null); // Clean up on unmount
+      // Clean up on unmount
+      set(myConnectionRef, null).catch(console.error);
     };
   }, [isOnline]);
 

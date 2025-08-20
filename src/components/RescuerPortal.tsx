@@ -13,6 +13,7 @@ const RescuerPortal: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = subscribeToSOSRequests((newRequests) => {
+      console.log('Received real-time update:', newRequests.length, 'requests');
       setRequests(newRequests);
       setLoading(false);
     });

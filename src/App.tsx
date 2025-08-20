@@ -45,6 +45,7 @@ function App() {
   const syncQueue = async () => {
     if (syncInProgress || queuedRequests.length === 0 || !isOnline) return;
 
+    console.log('Starting queue sync...', queuedRequests.length, 'requests');
     setSyncInProgress(true);
 
     try {
@@ -53,7 +54,8 @@ function App() {
 
       for (const queuedRequest of queue) {
         try {
-          await addSOSRequest(queuedRequest);
+          const requestId = await addSOSRequest(queuedRequest);
+          console.log('Synced queued request with ID:', requestId);
           processed.push(queuedRequest.id);
         } catch (error) {
           console.error('Error syncing request:', error);

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Debug Test</title>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    <div id="status">Testing...</div>
+    <button onclick="testWrite()">Test Write</button>
+    <button onclick="testRead()">Test Read</button>
+    <div id="results"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, push, onValue, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCasrxOLPq_UzCWdfo2rF15xAWgKSGCqhQ",
+            authDomain: "mumbaihacks-98c94.firebaseapp.com",
+            databaseURL: "https://mumbaihacks-98c94-default-rtdb.firebaseio.com",
+            projectId: "mumbaihacks-98c94",
+            storageBucket: "mumbaihacks-98c94.firebasestorage.app",
+            messagingSenderId: "409646664922",
+            appId: "1:409646664922:web:6cc43debdef1ec91a6e9e3",
+            measurementId: "G-7DW2C92SEF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const sosRequestsRef = ref(database, 'sosRequests');
+
+        document.getElementById('status').textContent = 'Firebase initialized';
+
+        window.testWrite = async () => {
+            try {
+                const testRequest = {
+                    name: 'Test User',
+                    age: 25,
+                    phone: '1234567890',
+                    message: 'This is a test emergency',
+                    coords: '40.7128, -74.0060',
+                    createdAt: new Date().toISOString(),
+                    lastModified: Date.now(),
+                    resolved: false,
+                    resolvedAt: null,
+                    priority: 'medium',
+                    category: 'other',
+                    priorityScore: 0.5,
+                    reasoning: 'Test request'
+                };
+
+                const newRef = push(sosRequestsRef);
+                await set(newRef, { ...testRequest, id: newRef.key });
+                document.getElementById('results').innerHTML += '<p>✅ Write successful: ' + newRef.key + '</p>';
+            } catch (error) {
+                document.getElementById('results').innerHTML += '<p>❌ Write failed: ' + error.message + '</p>';
+                console.error('Write error:', error);
+            }
+        };
+
+        window.testRead = () => {
+            onValue(sosRequestsRef, (snapshot) => {
+                const data = snapshot.val();
+                const count = data ? Object.keys(data).length : 0;
+                document.getElementById('results').innerHTML += '<p>📖 Read successful: ' + count + ' requests found</p>';
+                console.log('Read data:', data);
+            }, (error) => {
+                document.getElementById('results').innerHTML += '<p>❌ Read failed: ' + error.message + '</p>';
+                console.error('Read error:', error);
+            });
+        };
+
+        // Auto-test read on load
+        setTimeout(() => {
+            testRead();
+        }, 1000);
+    </script>
+</body>
+</html>
