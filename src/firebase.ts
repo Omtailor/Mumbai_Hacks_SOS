@@ -3,14 +3,15 @@ import { getDatabase, ref, push, onValue, update, remove, serverTimestamp } from
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
-};
+    apiKey: "AIzaSyCasrxOLPq_UzCWdfo2rF15xAWgKSGCqhQ",
+    authDomain: "mumbaihacks-98c94.firebaseapp.com",
+    databaseURL: "https://mumbaihacks-98c94-default-rtdb.firebaseio.com",
+    projectId: "mumbaihacks-98c94",
+    storageBucket: "mumbaihacks-98c94.firebasestorage.app",
+    messagingSenderId: "409646664922",
+    appId: "1:409646664922:web:6cc43debdef1ec91a6e9e3",
+    measurementId: "G-7DW2C92SEF"
+  };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
